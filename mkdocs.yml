@@ -1,0 +1,5 @@
+site_name: Neural Harmonizer 
+theme: 'windmill'
+repo_url: https://github.com/serrelab/neural_harmonizer
+extra:
+  logo: 'assets/logo.jpg'
