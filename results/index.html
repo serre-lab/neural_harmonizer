@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+  
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>Results - Neural Harmonizer</title>
+    <link href="../css/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="../css/font-awesome-4.7.0.css" rel="stylesheet">
+    <link href="../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="../js/jquery-3.2.1.min.js"></script>
+    <script src="../js/bootstrap-3.3.7.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    
+    <base target="_top">
+    <script>
+      var base_url = '..';
+      var is_top_frame = false;
+        
+        var pageToc = [
+          {title: "Results", url: "#_top", children: [
+              {title: "Harmonized models are more interpretable!", url: "#harmonized-models-are-more-interpretable" },
+          ]},
+        ];
+
+    </script>
+    <script src="../js/base.js"></script> 
+</head>
+
+<body>
+<script>
+if (is_top_frame) { $('body').addClass('wm-top-page'); }
+</script>
+
+
+
+<div class="container-fluid wm-page-content">
+  <a name="_top"></a>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav">
+      <a href=".." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href=".." class="btn btn-xs btn-link">
+        Home
+      </a>
+    </div>
+    
+  </div>
+
+    
+
+    <h1 id="results">Results</h1>
+<p><img src="../assets/results.gif" width="100%" align="center"></p>
+<p>DNNs trained on ImageNet face a trade-off between achieving high object recognition
+accuracy and predicting responses to natural images in IT. We measured the accuracy of 135
+DNNs at predicting image-evoked responses from neurons in posterior lateral (PL) and medial-
+lateral (ML) areas of IT by computing the neural predictivy of each model with the Brain-Score
+evaluation method. DNN neural predictivity is progressively worsening as models improve
+on ImageNet. This problem can be partially fixed by training DNNs with the neural harmonizer,
+which aligns their learned object representations with humans. Error bars denote 95% bootstrapped
+confidence intervals.</p>
+<h2 id="harmonized-models-are-more-interpretable">Harmonized models are more interpretable!</h2>
+<p>We used <a href="https://arxiv.org/abs/2211.10154">CRAFT</a> (Concept Recursive Activation Factorization) To find the concepts that are more important to make a decision. Harmonized models provide more stable concepts and interpretable concepts than non harmonized models. </p>
+<p><img src="../assets/craft" width="100%" align="center"></p>
+
+  <br>
+    
+
+    
+    
+      
+    
+
+  <div class="row wm-article-nav-buttons" role="navigation" aria-label="navigation">
+    
+    <div class="wm-article-nav">
+      <a href=".." class="btn btn-xs btn-default pull-left">
+        <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        Previous</a><a href=".." class="btn btn-xs btn-link">
+        Home
+      </a>
+    </div>
+    
+  </div>
+
+    <br>
+</div>
+
+<footer class="container-fluid wm-page-content">
+      <p>
+        <a href="https://github.com/serrelab/neural_harmonizer/edit/master/docs/results.md"><i class="fa fa-github"></i>
+Edit on GitHub</a>
+      </p>
+  <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a> using <a href="https://github.com/gristlabs/mkdocs-windmill">Windmill</a> theme by Grist Labs.</p>
+</footer>
+
+</body>
+</html>
