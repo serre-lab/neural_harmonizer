@@ -1,5 +1,6 @@
 site_name: Neural Harmonizer 
 theme: 'windmill'
-repo_url: https://github.com/serrelab/neural_harmonizer
+site_url: https://serre-lab.github.io/neural_harmonizer/
+repo_url: https://serre-lab.github.io/neural_harmonizer/
 extra:
   logo: 'assets/logo.jpg'
