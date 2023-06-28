@@ -39,6 +39,7 @@ One of the most impactful findings in computational neuroscience over the past d
 
 Surprisingly, across three independent experiments, we find that this is not the case. DNNs have become progressively worse models of IT as their accuracy has increased on ImageNet. To understand why DNNs experience this trade-off and evaluate if they are still an appropriate paradigm for modeling the visual system, we turn to recordings of IT that capture spatially resolved maps of neuronal activity elicited by natural images (Arcaro,2020). These neuronal activity maps reveal that DNNs trained on ImageNet learn to rely on different visual features than those encoded by IT and that this problem worsens as their accuracy increases. We successfully resolved this issue with the \emph{neural harmonizer}, a plug-and-play training routine for DNNs that aligns their learned representations with humans (Fel et al. 2020). Our results suggest that harmonized DNNs break the trade-off between ImageNet accuracy and neural prediction accuracy that assails current DNNs and offer a path to more accurate models of biological vision. Our work indicates that the standard approach for modeling IT with task-optimized DNNs needs revision, and other biological constraints, including human psychophysics data, are needed to accurately reverse-engineer the visual cortex.
 <img src="assets/data.png" width="40%" align="right">
+
 ## Data Release 
 
 We are realising the stimuli and the neural recordings that were used for this project. To obtain the files, the easiest way is to run the following code: 
@@ -46,10 +47,17 @@ We are realising the stimuli and the neural recordings that were used for this p
 ```python
 from neural_harmonizer.data import Neural_dataset
 
-clickme_ds = Neural_dataset()
+neural_ds = Neural_dataset()
 ```
+this would automatically download the data and organize it for your use! 
 
-This would automatically download the data and organize it for your use! 
+## Evaluating your own model
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BtpZj57SKOzgF0LUVCELJUuvjTsDvrqG) 
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Tensorflow_logo.svg/230px-Tensorflow_logo.svg.png" width=35>
+
+
+T
 
 
 ## 🗞️ Citation
