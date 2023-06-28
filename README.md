@@ -1,14 +1,10 @@
-
-
-<div style="text-align:center" class="latex-font">
-    <h1 style="text-align: rigth; font-weight: bold; color: inherit; margin-bottom: 0.2em"> Performance-optimized deep neural networks are evolving into worse models of inferotemporal visual cortex
+# Performance-optimized deep neural networks are evolving into worse models of inferotemporal visual cortex
  </h1>
 
-    <span class="author" style="font-weight: bold"> Ivan Felipe Rodriguez*<sup>1</sup>, Drew Linsley*<sup>1</sup>,Thomas Fel<sup>1</sup>, Michael Arcaro<sup>2</sup>, Saloni Sharma<sup>3</sup>,  <br> Margaret Livingstone<sup>3</sup>, Thomas Serre<sup>1</sup> </span> <br>
-    <span class="affiliations"> <sup>1</sup>Carney Institute for Brain Science, Brown University, Providence, RI 02912 </span> <br>
-     <span class="affiliations"> <sup>2</sup> Department of Psychology, University of Pennsylvania, Philadelphia, PA 19104</span> <br>
-      <span class="affiliations"> <sup>3</sup>Department of Neurobiology, Harvard Medical School, Boston, MA 02115 </span> <br>
-    <span class="mono"> {ivan_felipe_rodriguez,drew_linsley,thomas_fel,thomas_serre}@brown.edu </span>
+<div style="text-align:center" class="latex-font">
+    <h1 style="text-align: rigth; font-weight: bold; color: inherit; margin-bottom: 0.2em"> 
+
+    Ivan Felipe Rodriguez*, Drew Linsley*Thomas Fel, Michael Arcaro, Saloni Sharma,  Margaret Livingstone, Thomas Serre
 </div>
 
 <p align="center">
