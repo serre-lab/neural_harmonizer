@@ -39,16 +39,23 @@ Surprisingly, across three independent experiments, we find that this is not the
 
 We are realising the stimuli and the neural recordings that were used for this project. To obtain the files, the easiest way is to run the following code: 
 
+There are two primates "George" and "Red". For George, there are recordings for the mediolateral central IT, and posterior lateral IT. For Red only posterior lateral IT. 
+
+Here is how to obtain the original stimuli, the preprocessed stimuli ready to plug into your model and the neural recordings corresponding to that stimuli in the time window specified. 
+
 ```python
 from neural_harmonizer.data import Neural_dataset
 
 neural_ds = Neural_dataset()
+X, X_preprocessed, y = neural_ds.load_data(stimuli='george_central_it',time_a=50,time_b=90)
 ```
 
 This would automatically download the data and organize it for your use! 
 
 
 ## Evaluating your own model
+
+
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1BtpZj57SKOzgF0LUVCELJUuvjTsDvrqG) 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Tensorflow_logo.svg/230px-Tensorflow_logo.svg.png" width=35>
