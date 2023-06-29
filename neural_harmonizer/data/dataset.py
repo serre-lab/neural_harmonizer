@@ -48,10 +48,29 @@ class Neural_dataset():
         X -= _mean_imagenet
         X /= _mean_imagenet
         return X
+    def get_george_posterior_it_temp(self,a=50,b=90):
+        return self.george_posterior_it[:,::-1,::-1,a:b,:]
+
+    def get_george_central_it_temp(self,a=50,b=90):
+        return self.george_central_it[:,::-1,::-1,a:b,:]
     
-    def load_data(self):
+    def get_red_central_it_temp(self,a=50,b=90):
+        return self.red_central_it[:,::-1,::-1,a:b,:]
+    
+    def load_data(self,stimuli='george_central_it',time_a=50,time_b=90):
         """
-        Load the data. 
+
+        Load the data from the remote bucket. 
+
+        Input:
+            stimuli: str, one of 'george_central_it', 'george_posterior_it', 'red_central_it'
+            time_a: int, start time in ms
+            time_b: int, end time in ms
+        Output:     
+            X original stimuli
+            X_preprocessed preprocessed stimuli
+            y neural responses
+        
         
         The relevant info is in 'imageRF'
             dim 0 &1 : XY locations 
@@ -59,6 +78,7 @@ class Neural_dataset():
             dim 3 neural channels
                 george 1-32 are posterior IT and 33-63 are central IT
             dim 4 images
+            
         """
         
         logging.info('Downloading data from bucket.')
@@ -92,14 +112,24 @@ class Neural_dataset():
         self.preprocessed_stimuli_red = self.preprocessed_stimuli[-len(self.red_files):]
         self.preprocessed_stimuli_george = self.preprocessed_stimuli[:len(self.george_files)]
         logging.info('Data loaded.')
+        if stimuli == 'george_central_it':
+            self.X = self.original_stimuli_george
+            self.X_preprocessed = self.preprocessed_stimuli_george
+            self.y = self.get_george_central_it_temp(time_a,time_b)
+        elif stimuli == 'george_posterior_it':
+            self.X = self.original_stimuli_george
+            self.X_preprocessed = self.preprocessed_stimuli_george
+            self.y = self.get_george_posterior_it_temp(time_a,time_b)
+        elif stimuli == 'red_central_it':
+            self.X = self.original_stimuli_red
+            self.X_preprocessed = self.preprocessed_stimuli_red
+            self.y = self.get_red_central_it_temp(time_a,time_b)
+        else:    
+            raise ValueError('stimuli must be one of george_central_it, george_posterior_it, red_central_it')
+        logging.info('Data loaded.')
+        return self.X, self.X_preprocessed, self.y
     
     
-    def get_george_posterior_it_temp(self,a=50,b=90):
-        return self.george_posterior_it[:,::-1,::-1,a:b,:]
+    
 
-    def get_george_central_it_temp(self,a=50,b=90):
-        return self.george_central_it[:,::-1,::-1,a:b,:]
-    
-    def get_red_central_it_temp(self,a=50,b=90):
-        return self.red_central_it[:,::-1,::-1,a:b,:]
     
