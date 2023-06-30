@@ -13,14 +13,14 @@ import numpy as np
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG) 
 
-BUCKET_URL = 'https://storage.googleapis.com/serrelab-public/neural_recordings/arcaro_2020.zip'
+BUCKET_URL = 'https://storage.googleapis.com/serrelab-public/neural_recordings/Arcaro2020.zip'
 
 class Neural_dataset():
     """
     Class for neural images dataset.
     """
     def __init__(self):
-       self.load_data()  
+       self.download_to_local()  
 
     def download_to_local(self):
         """
@@ -34,7 +34,7 @@ class Neural_dataset():
         )
         logging.info(f'File download completed. Check {path_to_downloaded_file} for the downloaded zip file.')
         self.path_to_downloaded_file = path_to_downloaded_file
-        return path_to_downloaded_file
+        return path_to_downloaded_file[:-4]
     
     def preprocess(self):
         """
@@ -49,13 +49,13 @@ class Neural_dataset():
         X /= _mean_imagenet
         return X
     def get_george_posterior_it_temp(self,a=50,b=90):
-        return self.george_posterior_it[:,::-1,::-1,a:b,:]
+        return self.george_posterior_it[:,::-1,::-1,a:b,:].mean(axis=3)
 
     def get_george_central_it_temp(self,a=50,b=90):
-        return self.george_central_it[:,::-1,::-1,a:b,:]
+        return self.george_central_it[:,::-1,::-1,a:b,:].mean(axis=3)
     
     def get_red_central_it_temp(self,a=50,b=90):
-        return self.red_central_it[:,::-1,::-1,a:b,:]
+        return self.red_central_it[:,::-1,::-1,a:b,:].mean(axis=3)
     
     def load_data(self,stimuli='george_central_it',time_a=50,time_b=90):
         """
@@ -95,9 +95,9 @@ class Neural_dataset():
         self.george_central_it = george_data[:,:,:,:,33:]
         self.red_central_it = red_data 
 
-        logging.info('George posterior IT:',self.george_posterior_it.shape)
-        logging.info('George central IT:',self.george_central_it.shape)
-        logging.info('Red central IT:',self.red_central_it.shape)
+        #logging.info('George posterior IT:',str(self.george_posterior_it.shape))
+        #logging.info('George central IT:',str(self.george_central_it.shape))
+        #logging.info('Red central IT:',str(self.red_central_it.shape))
 
         self.george_files = [f'{path_to_downloaded_file}/George/natural_test/'+george_mat['UniqueNames'][0][i][0].split('\\')[-1] for i in range(george_data.shape[0])]
         self.red_files =  [f'{path_to_downloaded_file}/Red/red_naturalface/'+red_mat['UniqueNames'][0][i][0].split('\\')[-1] for i in range(red_data.shape[0])]

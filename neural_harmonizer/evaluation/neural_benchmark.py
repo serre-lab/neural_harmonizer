@@ -1,6 +1,6 @@
-from metrics import brain_score, salieny_score,spearmanr_sim
+from .metrics import brain_score, spearmanr_sim
 import numpy as np
-
+import tensorflow as tf
 
 
 def resizing_activity(activity_array,grid_size=17):
@@ -110,13 +110,15 @@ def score_model(activation_model,X,Y,grid_size=17):
 
     assert len(activity_array)>3, "The activation model should have at least 3 layers"
     if activity_array.shape[-1]>600:
-        a_shape = activity_array.flatten().shape
-        if a_shape%3==0:
+        flat_shape = activity_array.flatten().shape[0]
+        a_shape = activity_array.shape
+        try: 
             activity_array = np.average(activity_array.reshape(-1,3),axis=1).reshape(a_shape[0],a_shape[1],a_shape[2],-1)
-        elif a_shape%4==0:
-            activity_array = np.average(activity_array.reshape(-1,4),axis=1).reshape(a_shape[0],a_shape[1],a_shape[2],-1)
-        else: 
-            raise ValueError("Cannot resize incompatible shapes")  
+        except:
+            try:
+                activity_array = np.average(activity_array.reshape(-1,4),axis=1).reshape(a_shape[0],a_shape[1],a_shape[2],-1)
+            except: 
+                raise ValueError("Cannot resize incompatible shapes")  
     X_features = resizing_activity(activity_array,grid_size=grid_size)
     final_score, final_dice_act_4, final_dice_act_1 = score_features(X_features, Y,grid_size=grid_size)
     

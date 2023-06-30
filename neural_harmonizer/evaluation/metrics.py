@@ -195,6 +195,46 @@ def brain_score( X_train, Y_train, X_test, Y_test):
     )
 
     score = np.mean(correlations)
-    print(score)
+    #print(score)
 
     return score, pls_kernel,Y_pred
+
+def saliency_score(y_test,x_test,y_pred,activation_model,pls_kernel):
+    with tf.GradientTape(persistent=True) as tape:
+      tape.watch(x_test)
+      A_test = activation_model(x_test)
+      A_test = tf.cast(A_test,tf.float32)
+      y_pred = tf.matmul(A_test.reshape(17*17,-1) , pls_kernel)
+      loss = tf.abs(y_pred - y_test)
+   
+    saliency = tape.gradient(loss, x_test).numpy()
+    return saliency
+
+def spearmanr_sim(explanations1, explanations2, reducers = [1, 4, 16],visualize=False):
+  sims = {k: [] for k in reducers}
+
+  if explanations1.shape[-1] != 1:
+    explanations1 = explanations1[:,:,:,None]
+  if explanations2.shape[-1] != 1:
+    explanations2 = explanations2[:,:,:,None]
+
+  explanations1 = tf.cast(explanations1, tf.float32).numpy()
+  explanations2 = tf.cast(explanations2, tf.float32).numpy()
+
+  for reducer in reducers:
+    sz = int(explanations1.shape[1] / reducer)
+    explanations1_resize = tf.image.resize(explanations1, (sz, sz)).numpy()
+    explanations2_resize = tf.image.resize(explanations2, (sz, sz)).numpy()
+    
+    if visualize:
+      plt.subplot(1, 2, 1)
+      show(explanations1_resize[0])
+      plt.subplot(1, 2, 2)
+      show(explanations2_resize[0])
+      plt.show()
+    
+    for x1, x2 in zip(explanations1_resize, explanations2_resize):
+        rho, _ = spearmanr(x1.flatten(), x2.flatten())
+        sims[reducer].append(rho)
+
+  return sims
