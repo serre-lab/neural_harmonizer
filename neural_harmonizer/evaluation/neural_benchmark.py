@@ -83,30 +83,29 @@ def score_features(X_features, Y,grid_size=17):
     final_dice_act_1 = [np.array(dice_act_1).mean(),np.array(dice_act_1).std()]
     return final_score, final_dice_act_4, final_dice_act_1
 
-def score_model(activation_model,X,Y,grid_size=17):
+def score_model(activity_array,Y,grid_size=17):
     """
     Compute the brain score and saliency score for the neural network
-    
-    Parameters  
-    ----------
-    X_train :   tf.Tensor
-                Training data
-    Y_train :   tf.Tensor
-                Training labels
-    X_test  :   tf.Tensor   
-                Test data  
-    Y_test  :   tf.Tensor
-                Test labels
 
-    Returns     
-    ------- 
+    Parameters
+    ----------
+    activity_array  :   np.ndarray
+                        Array of neural activity                                    
+    Y               :   np.ndarray
+                        Array of labels     
+    grid_size       :   int 
+                        Size of the grid        
+
+    Returns
+    -------
     brain_score :   float
-                    Brain score
-    saliency_score   :   float
-                        Saliency score
+                    Brain score     
+    saliency_score   :   float  
+                        Saliency score  
     """
 
-    activity_array = activation_model.predict(X)
+
+    
 
     assert len(activity_array)>3, "The activation model should have at least 3 layers"
     if activity_array.shape[-1]>600:
@@ -122,4 +121,4 @@ def score_model(activation_model,X,Y,grid_size=17):
     X_features = resizing_activity(activity_array,grid_size=grid_size)
     final_score, final_dice_act_4, final_dice_act_1 = score_features(X_features, Y,grid_size=grid_size)
     
-    return final_score, final_dice_act_4, final_dice_act_1
+    return final_score, final_dice_act_4

@@ -238,3 +238,48 @@ def spearmanr_sim(explanations1, explanations2, reducers = [1, 4, 16],visualize=
         sims[reducer].append(rho)
 
   return sims
+
+
+def ceiling_score(neural_array, time_a=100,time_b=150):
+    """
+    Compute the ceiling score as the Spearman's correlation between the predicted
+    and the ground truth labels
+
+    Parameters
+    ----------
+
+    neural_array    :   np.array
+                        Array of neural responses               
+    time_a          :   int 
+                        Start time                      
+    time_b          :   int                                                                                                                 
+                        End time   
+            
+
+    Returns 
+    ------- 
+
+    score           :   float
+                        Ceiling score
+
+                    
+                        
+    """
+    N = neural_array.shape[0]
+    R = neural_array.shape[-1]
+    distances = np.zeros((R,R))
+    for j in range(R-1):
+      min_per_neuron = neural_array[:,:,:,time_a:time_b].mean(axis=3).min()
+      max_per_neuron = neural_array[:,:,:,time_a:time_b].mean(axis=3).max()
+      anchor_post = np.flipud(neural_array[:,:,:,time_a:time_b,j].mean(axis=3))-min_per_neuron/(max_per_neuron-min_per_neuron)
+      for i in range(R-1):
+         neural_post = np.flipud(neural_array[:,:,:,time_a:time_b,i].mean(axis=3))-min_per_neuron/(max_per_neuron-min_per_neuron)
+         score = spearmanr_sim(anchor_post, neural_post, reducers=[1, 4, 16])
+         distances[j,i] = np.mean(score[4])
+    ceiling = []
+    for i in range(N):
+      dist = distances[i,:]
+      idx = np.argsort(dist)
+      ceiling.append(distances[i,idx[:-2]].max())
+    return np.mean(ceiling)
+    
