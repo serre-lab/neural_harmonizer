@@ -39,7 +39,7 @@ def resizing_activity(activity_array,grid_size=17):
 
     return X_features
     
-def score_features(X_features, Y,grid_size=17):
+def score_features(X_features, Y,grid_size=17,reducer='median',correlation_fn ='pearson'):
     """
     Compute the brain score and saliency score for the neural network
     
@@ -69,10 +69,11 @@ def score_features(X_features, Y,grid_size=17):
         X_test = X_features[out].reshape(1*grid_size**2,-1)
         Y_train = Y[rest].reshape(13*grid_size**2,-1)
         Y_test = Y[out].reshape(1*grid_size**2,-1)
-        score,pls_kernel,y_pred= brain_score( X_train, Y_train, X_test, Y_test)
+        score,pls_kernel,y_pred= brain_score( X_train, Y_train, X_test, Y_test,correlation_fn=correlation_fn,reducer=reducer)
         gt = Y[out].mean(axis=2).reshape(1,grid_size,grid_size)
-        activity_saliency = y_pred.numpy().reshape(grid_size,grid_size,30).mean(axis=2)
-        dice_activity = spearmanr_sim(activity_saliency.reshape(1,grid_size,grid_size),gt)
+        
+        activity_saliency = y_pred.numpy().reshape(grid_size,grid_size,-1).mean(axis=2)
+        dice_activity = spearmanr_sim(activity_saliency.reshape(1,grid_size,grid_size),gt,reducers=[1,4])
 
         scores.append(score)
         dice_act_4.append(dice_activity[4][0])
@@ -83,7 +84,7 @@ def score_features(X_features, Y,grid_size=17):
     final_dice_act_1 = [np.array(dice_act_1).mean(),np.array(dice_act_1).std()]
     return final_score, final_dice_act_4, final_dice_act_1
 
-def score_model(activity_array,Y,grid_size=17):
+def score_model(activity_array,Y,grid_size=17,correlation_fn ='pearson',reducer='median'):
     """
     Compute the brain score and saliency score for the neural network
 
@@ -122,3 +123,36 @@ def score_model(activity_array,Y,grid_size=17):
     final_score, final_dice_act_4, final_dice_act_1 = score_features(X_features, Y,grid_size=grid_size)
     
     return final_score, final_dice_act_4
+
+def neural_benchmark_score(model,layers =None,stimuli='george_central_it',time_a=130,time_b=170,grid_size=17,correlation_fn ='pearson',reducer='median'):
+    
+    neural_ds = Neural_dataset()
+    X_or, X_pre, Y =  neural_ds.load_data(stimuli=stimuli,time_a=time_a,time_b=time_b)
+    neural_array = getattr(neural_ds,'george_central_it')
+    ceil_score = ceiling_score(neural_array,time_a=time_a,time_b=time_b, correlation_fn =correlation_fn,reducer=reducer)
+    if 'george' in stimuli:
+        grid_size=17
+    else:
+        grid_size=9 
+        
+    if layers == None:
+        print('No Layers prvided, using default layers')
+        layers = model.layers[:-10]
+        
+    for layer in layers:
+        name = layer.name
+        nn = name.replace('/','_') 
+        try: 
+            activation_model = tf.keras.Model(model.input, model.get_layer(name).output)
+            activity_array = activation_model.predict(X_pre)
+            layer_brainscore, dice_1 =score_model(activity_array,Y,grid_size=grid_size)
+            scores.append(layer_brainscore[0])
+            print(f'Layer {nn} score:',layer_brainscore[0])
+        except Exception as e: 
+            
+            continue
+    brain_score = max(scores)
+    print('Unceiled Brainscore for your model is :', brain_score)
+    print('ceiled Brainscore for your model is :', brain_score/ceil_score)
+    return brain_score/ceil_score, brain_score
+    

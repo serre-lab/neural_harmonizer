@@ -155,7 +155,7 @@ def tf_pearson_loss(x, y, axis=-1):
     
     return correlations
 
-def brain_score( X_train, Y_train, X_test, Y_test):
+def brain_score( X_train, Y_train, X_test, Y_test, n_components=25,reducer='median',correlation_fn='pearson'):
     """
     Compute the brain score as the Pearson's correlation between the predicted 
 
@@ -169,6 +169,14 @@ def brain_score( X_train, Y_train, X_test, Y_test):
                 Test data  
     Y_test  :   tf.Tensor
                 Test labels
+    n_components    :   int
+                        Number of components for the PLS regression
+    reduction   :   str
+                    Reduction method to aggregate the predicted scores. Options are 'mean' and 'median'. Default is 'median'
+                    
+    correlation :   str 
+                    Correlation method to compute the brain score. Options are 'pearson' and 'spearman'. Default is 'pearson'
+
 
     Returns     
     ------- 
@@ -188,14 +196,20 @@ def brain_score( X_train, Y_train, X_test, Y_test):
     Y_test = tf.cast(Y_test, tf.float32)
     X_test = tf.cast(X_test,tf.float32)
     Y_pred = tf.matmul(X_test, pls_kernel)
-
-    correlations = tf_pearson_loss(
-        tf.transpose(Y_pred),
-        tf.transpose(Y_test)
-    )
-
-    score = np.mean(correlations)
-    #print(score)
+    if correlation_fn == 'pearson':
+        correlations = tf_pearson_loss(
+            tf.transpose(Y_pred),
+            tf.transpose(Y_test)
+        )
+    elif correlation_fn == 'spearman': 
+        correlations = spearmanr_sim(y_pred,y_test,reducers=[1])
+    else:
+        raise ValueError('Unknown correlation metric')
+    if reducer == 'median':
+        score = np.median(correlations)
+    else:   
+        score = np.mean(correlations)
+    
 
     return score, pls_kernel,Y_pred
 
@@ -240,7 +254,23 @@ def spearmanr_sim(explanations1, explanations2, reducers = [1, 4, 16],visualize=
   return sims
 
 
-def ceiling_score(neural_array, time_a=100,time_b=150):
+def highest_off_diagonal(correlation_matrix):
+    if correlation_matrix.shape[0] != correlation_matrix.shape[1]:
+        raise ValueError("Matrix is not square!")
+    
+    n = correlation_matrix.shape[0]
+    
+    # Initialize with negative infinity to ensure we find the maximum value outside diagonal
+    max_value = -float('inf')
+    
+    for i in range(n):
+        for j in range(n):
+            if i != j and correlation_matrix[i,j] > max_value:
+                max_value = correlation_matrix[i,j]
+                
+    return max_value
+
+def ceiling_score(neural_array, time_a=100,time_b=150, correlation_fn ='pearson'):
     """
     Compute the ceiling score as the Spearman's correlation between the predicted
     and the ground truth labels
@@ -254,6 +284,7 @@ def ceiling_score(neural_array, time_a=100,time_b=150):
                         Start time                      
     time_b          :   int                                                                                                                 
                         End time   
+    
             
 
     Returns 
@@ -267,19 +298,37 @@ def ceiling_score(neural_array, time_a=100,time_b=150):
     """
     N = neural_array.shape[0]
     R = neural_array.shape[-1]
-    distances = np.zeros((R,R))
-    for j in range(R-1):
-      min_per_neuron = neural_array[:,:,:,time_a:time_b].mean(axis=3).min()
-      max_per_neuron = neural_array[:,:,:,time_a:time_b].mean(axis=3).max()
-      anchor_post = np.flipud(neural_array[:,:,:,time_a:time_b,j].mean(axis=3))-min_per_neuron/(max_per_neuron-min_per_neuron)
-      for i in range(R-1):
-         neural_post = np.flipud(neural_array[:,:,:,time_a:time_b,i].mean(axis=3))-min_per_neuron/(max_per_neuron-min_per_neuron)
-         score = spearmanr_sim(anchor_post, neural_post, reducers=[1, 4, 16])
-         distances[j,i] = np.mean(score[4])
+    correlations = np.zeros((N,R,R))
+    # Compute the minimum and maximum activity across all neurons and images
+    min_activity = neural_array[:,:,:,time_a:time_b].mean(axis=3).min()
+    max_activity = neural_array[:,:,:,time_a:time_b].mean(axis=3).max()
+    for n in range(N):
+        for i in range(R-1):
+            # Take an anchor neurontake the average activity over the time window and flip the array to match the orientation of the images
+            # Then Normalize 
+            anchor_post = np.flipud(neural_array[n,:,:,time_a:time_b,i].mean(axis=2))-min_activity/(max_activity-min_activity)
+            for j in range(R-1):
+                #To avoid computing the same correlation twice
+                if i>=j:
+                    continue
+                # Take a tarjet neuron, take the average activity over the time window and flip the array to match the orientation of the images
+                neural_post = np.flipud(neural_array[n,:,:,time_a:time_b,j].mean(axis=2))-min_activity/(max_activity-min_activity)
+                
+                # make sure to use the same correlation function as the one used to compute the brain score. 
+                if correlation_fn  == 'spearman':
+                    score = spearmanr_sim(anchor_post, neural_post, reducers=[1, 4])[1]
+                elif correlation_fn == 'pearson':
+                    score = tf_pearson_loss(anchor_post,neural_post)
+                else:
+                    print('Please select a valid correlation function')
+                    return
+                # Since there is a grid of locations, compute the mean across all the locations
+                correlations[n,i,j]=  np.mean(score)
+            
     ceiling = []
-    for i in range(N):
-      dist = distances[i,:]
-      idx = np.argsort(dist)
-      ceiling.append(distances[i,idx[:-2]].max())
+    # Computing the ceiling score as the maximum correlation between the anchor neuron and the other neurons
+    # then taking the mean across all the images.
+    for n in range(N):
+      dist = highest_off_diagonal(correlations[n,:])
+      ceiling.append(dist)
     return np.mean(ceiling)
-    
